@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const foodSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   servingSize: {
     type: String,
-    required: true,
+    required: true
   },
   servingWeightGrams: {
     type: Number,
@@ -15,19 +15,19 @@ const foodSchema = new mongoose.Schema({
   },
   calories: {
     type: Number,
-    required: true,
+    required: true
   },
   protein: {
     type: Number,
-    required: true,
+    required: true
   },
   fat: {
     type: Number,
-    required: true,
+    required: true
   },
   carbs: {
     type: Number,
-    required: true,
+    required: true
   }
 });
 

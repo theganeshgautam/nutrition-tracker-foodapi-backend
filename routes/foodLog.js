@@ -22,9 +22,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Log food item
 router.post('/log', authenticate, async (req, res) => {
-  const { foodName, servingSize, calories, protein, fat, carbs } = req.body;
+  const { foodName, servingSize, calories, protein, fat, carbs, servingWeightGrams } = req.body;
 
-  if (!foodName || !servingSize || calories === undefined || protein === undefined || fat === undefined || carbs === undefined) {
+  if (!foodName || !servingSize || calories === undefined || protein === undefined || fat === undefined || carbs === undefined || servingWeightGrams === undefined) {
     return res.status(400).json({ error: 'All nutritional values are required.' });
   }
 
@@ -42,7 +42,8 @@ router.post('/log', authenticate, async (req, res) => {
       calories,
       protein,
       fat,
-      carbs
+      carbs,
+      servingWeightGrams
     });
 
     await foodLog.save();
