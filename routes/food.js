@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const Food = require('../models/Food');
+const { authenticate } = require('../middleware/authenticate');
 require('dotenv').config();
-const authenticate = require('../middleware/authenticate');
+// const authenticate = require('../middleware/authenticate');
 
 const NUTRITIONIX_APP_ID = process.env.NUTRITIONIX_APP_ID;
 const NUTRITIONIX_API_KEY = process.env.NUTRITIONIX_API_KEY;

@@ -1,24 +1,8 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const FoodLog = require('../models/FoodLog');
-const Food = require('../models/Food');
 const router = express.Router();
-const authenticate = require('../middleware/authenticate');  // Import the middleware
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-// Middleware to authenticate the user
-// This line is no longer necessary since we are importing the middleware
-// const authenticate = (req, res, next) => {
-//   const token = req.header('Authorization').replace('Bearer ', '');
-//   try {
-//     const decoded = jwt.verify(token, JWT_SECRET);
-//     req.user = decoded;
-//     next();
-//   } catch (error) {
-//     res.status(401).json({ message: 'Unauthorized' });
-//   }
-// };
+const FoodLog = require('../models/FoodLog');
+const { authenticate } = require('../middleware/authenticate');
+// const authenticate = require('../middleware/authenticate');
 
 // Log food item
 router.post('/log', authenticate, async (req, res) => {
@@ -29,12 +13,6 @@ router.post('/log', authenticate, async (req, res) => {
   }
 
   try {
-    const food = await Food.findOne({ name: foodName });
-
-    if (!food) {
-      return res.status(404).json({ message: 'Food item not found' });
-    }
-
     const foodLog = new FoodLog({
       userId: req.user.userId,
       foodName,
@@ -58,6 +36,49 @@ router.get('/logs', authenticate, async (req, res) => {
   try {
     const foodLogs = await FoodLog.find({ userId: req.user.userId });
     res.json(foodLogs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update a food log entry
+router.put('/log/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+  const { foodName, servingSize, calories, protein, fat, carbs, servingWeightGrams } = req.body;
+
+  if (!foodName || !servingSize || calories === undefined || protein === undefined || fat === undefined || carbs === undefined || servingWeightGrams === undefined) {
+    return res.status(400).json({ error: 'All nutritional values are required.' });
+  }
+
+  try {
+    const foodLog = await FoodLog.findOneAndUpdate(
+      { _id: id, userId: req.user.userId },
+      { foodName, servingSize, calories, protein, fat, carbs, servingWeightGrams },
+      { new: true }
+    );
+
+    if (!foodLog) {
+      return res.status(404).json({ message: 'Food log not found' });
+    }
+
+    res.json(foodLog);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete a food log entry
+router.delete('/log/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const foodLog = await FoodLog.findOneAndDelete({ _id: id, userId: req.user.userId });
+
+    if (!foodLog) {
+      return res.status(404).json({ message: 'Food log not found' });
+    }
+
+    res.json({ message: 'Food log deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
